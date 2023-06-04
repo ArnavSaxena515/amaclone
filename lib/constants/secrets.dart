@@ -1,0 +1,2 @@
+const cloudinaryCloudName = '';
+const cloudinaryUploadPreset = '';
