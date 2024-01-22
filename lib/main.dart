@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
             appBarTheme: const AppBarTheme(
                 elevation: 0, iconTheme: IconThemeData(color: Colors.black))),
         home: Provider.of<UserProvider>(context).user.token.isNotEmpty
-            ? Provider.of<UserProvider>(context).user.type == 'User'
+            ? Provider.of<UserProvider>(context).user.type == 'user'
                 ? const Navbar()
                 : const AdminScreen()
             : const AuthScreen());

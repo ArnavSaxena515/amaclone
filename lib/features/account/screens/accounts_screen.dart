@@ -1,12 +1,31 @@
+import 'dart:math';
+
+import 'package:amaclone/features/account/services/account_services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../widget/UserGreeting.dart';
 import '../widget/account_button.dart';
 import '../widget/orders.dart';
 import '../../../constants/global_variables.dart';
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends StatefulWidget {
   const AccountScreen({Key? key}) : super(key: key);
 
+  @override
+  State<AccountScreen> createState() => _AccountScreenState();
+}
+
+class _AccountScreenState extends State<AccountScreen> {
+  late AccountServices accountServices;
+  @override
+  void initState() {
+    accountServices = AccountServices(context: context);
+    logout();
+    super.initState();
+  }
+  void logout()async{
+    accountServices.logOut();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,12 +76,16 @@ class AccountScreen extends StatelessWidget {
                 AccountButton(
                     text: 'Your Orders',
                     onTap: () {
-                      print('pressed');
+                      if (kDebugMode) {
+                        print('pressed');
+                      }
                     }),
                 AccountButton(
                     text: 'Turn Seller',
                     onTap: () {
-                      print('pressed');
+                      if (kDebugMode) {
+                        print('pressed');
+                      }
                     }),
               ],
             ),
@@ -75,12 +98,15 @@ class AccountScreen extends StatelessWidget {
                 AccountButton(
                     text: 'Log out',
                     onTap: () {
-                      print('pressed');
+
+                      logout();
                     }),
                 AccountButton(
                     text: 'Your Wish List',
                     onTap: () {
-                      print('pressed');
+                      if (kDebugMode) {
+                        print('pressed');
+                      }
                     }),
               ],
             ),

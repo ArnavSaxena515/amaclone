@@ -1,3 +1,5 @@
+import 'package:amaclone/features/admin/screens/analytics_screen.dart';
+import 'package:amaclone/features/admin/screens/orders_screen.dart';
 import 'package:amaclone/features/admin/screens/posts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -14,8 +16,8 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> {
   List<Widget> pages = [
     const PostsScreen(),
-    const Center(child: Text('Analytics'),),
-    const Center(child: Text('Orders'),),
+    const AnalyticsScreen(),
+    const OrdersScreen()
   ];
   int _page = 0;
 

@@ -2,13 +2,15 @@
 const express = require("express");
 const authRouter = require("./routes/auth.js");
 const adminRouter = require("./routes/admin.js");
+const productRouter = require("./routes/product.js");
+const userRouter = require("./routes/user.js");
+
 const mongoose = require("mongoose");
 const constants = require("./constants");
 const mongoURL = constants.mongoURL;
 console.log(mongoURL);
 const PORT = 3000;
-// const mongoDBURL =
-//   "mongodb+srv://arnavsaxena54:Blaugrana195787@cluster0.on7eqko.mongodb.net/?retryWrites=true&w=majority";
+
 // Initialising the app
 const app = express();
 
@@ -16,9 +18,11 @@ const app = express();
 app.use(express.json());
 app.use(authRouter);
 app.use(adminRouter);
+app.use(productRouter);
+app.use(userRouter);
 
 // Connecting to mongoose
-mongoose
+mongooses
   .connect(mongoURL)
   .then(() => {
     console.log("Connected to mongodb");

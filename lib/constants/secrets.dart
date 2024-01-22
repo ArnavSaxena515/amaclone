@@ -1,2 +1,2 @@
-const cloudinaryCloudName = '';
-const cloudinaryUploadPreset = '';
+const cloudinaryCloudName = 'ddjfsqxja';
+const cloudinaryUploadPreset = 'pwrjsepk';

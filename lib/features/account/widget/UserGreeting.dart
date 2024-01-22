@@ -8,7 +8,7 @@ class UserGreeting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _user = Provider.of<UserProvider>(context).user;
+    final user = Provider.of<UserProvider>(context).user;
     return Container(
       padding: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
       decoration: const BoxDecoration(
@@ -22,7 +22,7 @@ class UserGreeting extends StatelessWidget {
                 style: const TextStyle(color: Colors.black, fontSize: 22),
                 children: [
                   TextSpan(
-                      text: _user.name,
+                      text: user.name,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 22,

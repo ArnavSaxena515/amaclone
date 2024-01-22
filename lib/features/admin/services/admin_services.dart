@@ -3,12 +3,17 @@ import 'dart:convert';
 import 'package:amaclone/constants/error_handling.dart';
 import 'package:amaclone/constants/utils.dart';
 import 'package:amaclone/constants/secrets.dart';
+import 'package:amaclone/features/admin/models/sales.dart';
+import 'package:amaclone/models/order.dart';
 import 'package:amaclone/models/user.dart';
 import 'package:amaclone/provider/user_provider.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:amaclone/models/product.dart';
+
+// ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../../../constants/global_variables.dart';
@@ -29,8 +34,6 @@ class AdminServices {
       required String category,
       required List<XFile> images}) async {
     try {
-
-
       final cloudinary =
           CloudinaryPublic(cloudinaryCloudName, cloudinaryUploadPreset);
 
@@ -39,13 +42,14 @@ class AdminServices {
         //final assetId = jsonDecode(response.body)['_id'];
         CloudinaryResponse res = await cloudinary.uploadFile(
           CloudinaryFile.fromFile(images[i].path,
-           //   publicId: assetId,
+              //   publicId: assetId,
               folder: name,
               resourceType: CloudinaryResourceType.Image),
         );
         imageURLs.add(res.secureUrl);
+
       }
-      print(imageURLs);
+
       Product product = Product(
         name: name,
         description: description,
@@ -53,9 +57,9 @@ class AdminServices {
         quantity: quantity,
         price: price,
         sellerId: user.id,
-        imageUrls: [...imageURLs],
+        images: [...imageURLs],
       );
-      print(product.imageUrls);
+
 
       http.Response response = await http.post(
           Uri.parse('$uri/admin/add-product'),
@@ -65,8 +69,9 @@ class AdminServices {
           },
           body: jsonEncode(product));
 
-      print(response.body);
 
+
+      // ignore: use_build_context_synchronously
       httpErrorHandler(
           response: response,
           context: context,
@@ -75,44 +80,156 @@ class AdminServices {
             Navigator.pop(context);
           });
     } catch (e) {
-      print(e.toString());
+
       showSnackBar(context, e.toString());
     }
   }
 
-  void getProducts() async {
+  Future<List<Product>> getProducts() async {
+    List<Product> products = [];
     try {
-      print(user.id);
-      http.Response response = await http.get(
-        Uri.parse('$uri/admin/get-products'),
-        headers: <String, String>{
-          "Content-Type": "application/json; charset=UTF-8",
-          'x-auth-token': user.token,
-          "sellerId": user.id
-        }
-      );
-      print(response.body);
+      http.Response response = await http
+          .get(Uri.parse('$uri/admin/get-products'), headers: <String, String>{
+        "Content-Type": "application/json; charset=UTF-8",
+        'x-auth-token': user.token,
+        "sellerId": user.id
+      });
 
-      final cloudinary =
-          CloudinaryPublic(cloudinaryCloudName, cloudinaryUploadPreset);
-      final products = (jsonDecode(response.body)['products']);
-      String url = '';
-      for (int i = 0; i < products.length; i++) {
-        print( "stuff");
-        url =
-            'https://api.cloudinary.com/v1_1/$cloudinaryCloudName/${products[i]["_id"]}';
-        print(cloudinary.getImage(products[i]["_id"]));
-        print(cloudinary.getImage(products[i]["_id"]).url);
-        print(cloudinary.getImage(products[i]["_id"]).publicId);
-        CloudinaryImage img = cloudinary.getImage(products[i]["_id"]);
 
-        // print(url);
-        // http.Response res = await http.get(Uri.parse(url));
-        // print(res.statusCode);
-        // print(res.body);
-      }
+      // ignore: use_build_context_synchronously
+      httpErrorHandler(
+          response: response,
+          context: context,
+          onSuccess: () {
+            final temp = jsonDecode(response.body);
+            for (int i = 0; i < temp['products'].length; i++) {
+              products.add(Product.fromJson(temp['products'][i]));
+            }
+
+          });
+
+      return products;
     } catch (e) {
-      print(e.toString());
+      showSnackBar(context, e.toString());
+      return [];
+    }
+  }
+
+  Future<void> deleteProduct(String productId) async {
+    try {
+      http.Response response =
+          await http.delete(Uri.parse('$uri/admin/delete-product'),
+              headers: <String, String>{
+                "Content-Type": "application/json; charset=UTF-8",
+                'x-auth-token': user.token,
+                "sellerId": user.id
+              },
+              body: jsonEncode({'productId': productId}));
+      // ignore: use_build_context_synchronously
+      httpErrorHandler(
+          response: response,
+          context: context,
+          onSuccess: () {
+            showSnackBar(context, "Product deleted");
+          });
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
+
+  Future<List<Order>> getAllOrders() async {
+    List<Order> orders = [];
+    try {
+      http.Response response = await http.get(
+          Uri.parse('$uri/admin/get-all-orders'),
+          headers: <String, String>{
+            "Content-Type": "application/json; charset=UTF-8",
+            'x-auth-token': user.token,
+            //"sellerId": user.id
+          });
+
+      // ignore: use_build_context_synchronously
+      httpErrorHandler(
+          response: response,
+          context: context,
+          onSuccess: () {
+            final temp = jsonDecode(response.body)['orders'];
+            for (int i = 0; i < temp.length; i++) {
+              orders.add(Order.fromJson(temp[i]));
+            }
+          });
+
+      return orders;
+    } catch (e) {
+      showSnackBar(context, e.toString());
+      return [];
+    }
+  }
+
+  Future<List<Order>> changeOrderStatus(
+      {required int status,
+      required Order order,
+      required VoidCallback onSuccess}) async {
+    List<Order> orders = [];
+    try {
+      final body = jsonEncode({'id': order.id, 'status': status});
+      http.Response response =
+          await http.post(Uri.parse('$uri/admin/change-order-status'),
+              headers: <String, String>{
+                "Content-Type": "application/json; charset=UTF-8",
+                'x-auth-token': user.token,
+                //"sellerId": user.id
+              },
+              body: body);
+
+      // ignore: use_build_context_synchronously
+      httpErrorHandler(
+          response: response, context: context, onSuccess: onSuccess);
+
+      return orders;
+    } catch (e) {
+      showSnackBar(context, e.toString());
+
+      return [];
+    }
+  }
+
+  Future<Map<String, dynamic>> getEarnings() async {
+    List<Sales> sales = [];
+    int totalEarning = 0;
+    try {
+      http.Response response = await http
+          .get(Uri.parse('$uri/admin/analytics'), headers: <String, String>{
+        "Content-Type": "application/json; charset=UTF-8",
+        'x-auth-token': user.token,
+        //"sellerId": user.id
+      });
+
+      // ignore: use_build_context_synchronously
+      httpErrorHandler(
+          response: response,
+          context: context,
+          onSuccess: () {
+            var temp = jsonDecode(response.body);
+
+            totalEarning = temp['totalEarnings'];
+            sales = [
+              Sales('Mobiles', temp['mobileEarnings']),
+              Sales('Essentials', temp['essentialsEarnings']),
+              Sales('Appliances', temp['appliancesEarnings']),
+              Sales('Books', temp['booksEarnings']),
+              Sales('Fashion', temp['fashionEarnings']),
+            ];
+          });
+
+      return {
+        'sales':sales,
+        'totalEarnings':totalEarning
+      };
+    } catch (e) {
+      showSnackBar(context, e.toString());
+
+      return {};
     }
   }
 }

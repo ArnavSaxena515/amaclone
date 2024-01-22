@@ -1,7 +1,8 @@
 import 'package:amaclone/constants/global_variables.dart';
 import 'package:amaclone/features/account/screens/accounts_screen.dart';
+import '../../features/cart/screens/cart_screen.dart';
 import 'package:amaclone/features/home/screens/home_screens.dart';
-import 'package:badges/badges.dart';
+// import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
@@ -22,7 +23,7 @@ class _NavbarState extends State<Navbar> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const AccountScreen(),
-    const Center(child: Text("Cart"))
+    const CartScreen()
   ];
 
   void _updatePage(int page) {

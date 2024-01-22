@@ -1,6 +1,4 @@
-import 'package:amaclone/provider/user_provider.dart';
-import 'package:provider/provider.dart';
-
+import 'package:amaclone/constants/loading_widget.dart';
 import '../../../common/widgets/custom_button.dart';
 import '../../../common/widgets/custom_textfield.dart';
 import '../../../constants/utils.dart';
@@ -38,7 +36,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   void initState() {
     // TODO: implement initState
     _adminServices = AdminServices(context: context);
-    context;
+
     super.initState();
   }
 
@@ -64,7 +62,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _isLoading =true;
     });
     if (_addProductFormKey.currentState!.validate() && images.isNotEmpty) {
-      final adminUserId = Provider.of<UserProvider>(context,listen: false).user.id;
       _adminServices.sellProduct(
 
 
@@ -80,10 +77,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
   }
 
-  void getProduct(){
-    final adminUserId = Provider.of<UserProvider>(context,listen: false).user.id;
-    _adminServices.getProducts();
-  }
+
 
   @override
   void dispose() {
@@ -113,7 +107,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       FocusScope.of(context).requestFocus(_quantityNode);
     }
 
-    return Scaffold(
+    return _isLoading? const LoadingWidget() :Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50),
         child: AppBar(
@@ -130,7 +124,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             ))),
       ),
       body: SingleChildScrollView(
-        child: _isLoading? const CircularProgressIndicator() :Form(
+        child: Form(
           key: _addProductFormKey,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -170,7 +164,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             ),
                           ),
                         )
-                      : CarouselImage(images: images),
+                      : CarouselImage.fromFile(images: images),
                 ),
                 const SizedBox(height: 30),
                 CustomTextField(

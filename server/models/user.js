@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const { productSchema } = require("./product");
 
 userSchema = mongoose.Schema({
   name: {
@@ -14,7 +15,7 @@ userSchema = mongoose.Schema({
     validate: {
       // using regular expressioin to validate email
       validator: (value) => {
-      //todo: fix regex
+        //todo: fix regex
         //        const re =
         //          /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
         //        return value.match(re);
@@ -37,6 +38,12 @@ userSchema = mongoose.Schema({
     default: "user",
   },
   // add cart
+  cart: [
+    {
+      product: productSchema,
+      quantity: { type: Number, required: true },
+    },
+  ],
 });
 // method to generate hash for a new password
 userSchema.methods.generateHash = (password) => {

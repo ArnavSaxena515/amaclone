@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const constants = require("../constants");
 const User = require("../models/user");
 const admin = async (req, res, next) => {
+
   try {
     const token = req.header("x-auth-token");
     if (!token) {

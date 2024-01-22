@@ -15,7 +15,7 @@ authRouter.post("/api/signup", async (req, res) => {
 
   try {
     const { name, email, password } = req.body;
-    // Handle validations, maybe add encryption?
+    
     // checking if user with this email ID already exists
     const existingUser = await User.findOne({ email });
 

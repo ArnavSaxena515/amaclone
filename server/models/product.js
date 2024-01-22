@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const ratingsSchema = require("./ratings");
+
 
 const productSchema = mongoose.Schema({
   name: {
@@ -35,8 +37,24 @@ const productSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  ratings: [ratingsSchema],
+  averageRating: {
+    type: Number,
+    index:true,
+  },
 });
 
+
+productSchema.methods.calculateAverageRating =
+  function calculateAverageRating() {
+    console.log(this.model);
+    let length = this.ratings.length;
+    let sum = 0;
+    this.ratings.forEach((element) => {
+      sum = sum + element["rating"];
+    });
+    this.averageRating = sum / length;
+  };
 const Product = mongoose.model("Product", productSchema);
 
-module.exports = Product;
+module.exports = {Product, productSchema};

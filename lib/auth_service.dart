@@ -8,10 +8,12 @@ import 'package:amaclone/constants/utils.dart';
 
 import 'package:amaclone/provider/user_provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'common/widgets/navbar.dart';
 import 'models/user.dart';
+// ignore: depend_on_referenced_packages
 import "package:http/http.dart" as http;
 
 class AuthService {
@@ -65,16 +67,23 @@ class AuthService {
           onSuccess: () async {
             SharedPreferences sharedPreferencesInstance =
                 await SharedPreferences.getInstance();
+
             final responseBody = jsonDecode(response.body);
+
             Provider.of<UserProvider>(context, listen: false)
                 .setUser(jsonDecode(response.body));
+
             await sharedPreferencesInstance.setString(
                 'x-auth-token', responseBody['token']);
+                
             Navigator.pushNamedAndRemoveUntil(
                 context, Navbar.routeName, (route) => false);
           });
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
+      showSnackBar(context, e.toString());
     }
   }
 
@@ -95,7 +104,9 @@ class AuthService {
             "Content-Type": "application/json; charset=UTF-8",
             'x-auth-token': token!
           });
-      print(tokenResponse);
+      if (kDebugMode) {
+        print(tokenResponse);
+      }
 
       if (jsonDecode(tokenResponse.body) == true) {
         // get user data
@@ -109,7 +120,9 @@ class AuthService {
         userProvider.setUser(jsonDecode(userResponse.body));
       }
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 }

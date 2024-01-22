@@ -1,6 +1,11 @@
 import 'package:amaclone/constants/global_variables.dart';
-import 'package:amaclone/features/account/widget/product.dart';
+import 'package:amaclone/features/account/services/account_services.dart';
+import 'package:amaclone/features/account/widget/single_product_display.dart';
+import 'package:amaclone/features/order_details/screens/order_details_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../../../constants/loading_widget.dart';
+import '../../../models/order.dart';
 
 class Orders extends StatefulWidget {
   const Orders({Key? key}) : super(key: key);
@@ -10,19 +15,38 @@ class Orders extends StatefulWidget {
 }
 
 class _OrdersState extends State<Orders> {
-  List temporaryItems = [
-    'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif',
-    // 'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif',
-    // 'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif',
-    'https://codelabs.developers.google.com/static/codelabs/flutter-flame-game/img/afb0fd6677c2a621.png',
-    'https://codelabs.developers.google.com/static/codelabs/flutter-flame-game/img/afb0fd6677c2a621.png',
-    'https://codelabs.developers.google.com/static/codelabs/flutter-flame-game/img/afb0fd6677c2a621.png',
-    'https://codelabs.developers.google.com/static/codelabs/flutter-flame-game/img/afb0fd6677c2a621.png'
-  ];
+  List<Order>? orders = [];
+
+  late AccountServices accountServices;
+
+  @override
+  void initState() {
+    accountServices = AccountServices(context: context);
+    fetchOrders();
+    super.initState();
+  }
+
+  void fetchOrders() async {
+    final stuff = await accountServices.getOrders();
+    setState(() {});
+    if (stuff.isNotEmpty) {
+      orders = [];
+      for (int i = 0; i < stuff.length; i++) {
+          orders?.add(stuff[i]);
+      }
+
+      setState(() {
+
+      });
+      return;
+    } else {
+      orders = [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return orders==null ? const LoadingWidget() :  Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -48,11 +72,17 @@ class _OrdersState extends State<Orders> {
           height: 180,
           padding: const EdgeInsets.only(left: 10, top: 20, right: 0),
           child: ListView.builder(
-              itemCount: temporaryItems.length,
+              itemCount: orders!.length,
               scrollDirection: Axis.horizontal,
               itemBuilder: ((context, index) {
-                return Product(
-                  image: temporaryItems[index],
+
+                return InkWell(
+                  onTap: (){
+                    Navigator.pushNamed(context, OrderDetailScreen.routeName,arguments: orders![index]);
+                  },
+                  child: SingleProductDisplay(
+                    image: orders![index].products[0].images[0],
+                  ),
                 );
               })),
         ),
